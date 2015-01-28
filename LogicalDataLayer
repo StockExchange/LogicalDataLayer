@@ -9,19 +9,27 @@ namespace StockExchange
     class LogicalDataLayer
     {
         DAL DAL = new DAL();
+
         public String LoginCheck(String UserId, String PassWord)
         {
-            if (DAL.GetAdminPassWordCheck(UserId, PassWord) != null)
-            {
-                return "admin";
-            }
-            else if (DAL.GetUserPassWordCheck(UserId, PassWord) != null)
-            {
-                return "user";
-            }
-            else {
-                return null;
-            }
+
+            
+                if (DAL.GetAdminPassWordCheck(UserId, PassWord) != null)
+                {
+                    return "admin";
+                }
+                else if (DAL.GetUserPassWordCheck(UserId, PassWord) != null)
+                {
+                    return "user";
+                }
+                else
+                {
+                    return DAL.ErrorMessage();
+                }
+            
+            
+
+
 
 
         }
