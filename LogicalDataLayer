@@ -8,9 +8,8 @@ namespace StockExchange
 {
     class LogicalDataLayer
     {
-        DAL DAL = new DAL();
 
-        public String LoginCheck(String UserId, String PassWord)
+        public String LoginCheck(String UserId, String PassWord, DAL DAL)
         {
 
             
@@ -24,7 +23,7 @@ namespace StockExchange
                 }
                 else
                 {
-                    return DAL.ErrorMessage();
+                    return null;
                 }
             
             
