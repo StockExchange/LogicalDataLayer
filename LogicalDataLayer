@@ -9,6 +9,26 @@ namespace StockExchange
     class LogicalDataLayer
     {
 
+
+        public String SellStock(String UserId, String StockId, int Amount, DAL DAL)
+        {
+            Double CurrentValue = Convert.ToDouble(DAL.GetStock(StockId).currentValue);
+            Double Earned = 0;
+            int NewAmount;
+            Earned = Amount * CurrentValue;
+
+            Stockportfolio StockPortfolio = DAL.GetStockPortfolio(UserId, StockId);
+            NewAmount = (Convert.ToInt32(StockPortfolio.amount) - Amount);
+            if (NewAmount == 0)
+            {
+                DAL.RemoveStockportfolio(UserId, StockId);
+            }
+            else
+            {
+                DAL.UpdateStockPortfolio(UserId, StockId, NewAmount);
+            }
+            return DAL.SellStock(UserId, Earned);
+        }
         public String LoginCheck(String UserId, String PassWord, DAL DAL)
         {
 
@@ -48,6 +68,8 @@ namespace StockExchange
                 TmpStockList.Add(StockArray);
             }
             return TmpStockList;
-        } 
+        }
+
+        public int Amount { get; set; }
     }
 }
