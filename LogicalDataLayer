@@ -26,11 +26,28 @@ namespace StockExchange
                     return null;
                 }
             
-            
-
-
-
-
         }
+
+        public List<String[]> GetUserStocks(String UserId, DAL DAL)
+        {
+            List<String[]> TmpStockList = new List<String[]>();
+            
+            foreach (Stockportfolio S in DAL.GetUserStocks(UserId))
+            {
+                String[] StockArray = new String[5];
+                StockArray[0] = S.sName;
+                StockArray[1] = Convert.ToString(S.amount);
+                StockArray[2] = Convert.ToString(DAL.GetStock(S.sName).currentValue);
+                StockArray[3] = Convert.ToString(S.value);
+
+                Double CurrentValue = Convert.ToDouble(DAL.GetStock(S.sName).currentValue);
+                String Value = ((CurrentValue / S.value) * 100).ToString(".##");
+
+                StockArray[4] = Value;
+                
+                TmpStockList.Add(StockArray);
+            }
+            return TmpStockList;
+        } 
     }
 }
