@@ -70,6 +70,5 @@ namespace StockExchange
             return TmpStockList;
         }
 
-        public int Amount { get; set; }
     }
 }
