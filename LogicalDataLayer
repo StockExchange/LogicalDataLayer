@@ -8,36 +8,89 @@ namespace StockExchange
 {
     class LogicalDataLayer
     {
-
-
-        public String SellStock(String UserId, String StockId, int Amount, DAL DAL)
+        public String UpdateStock(String SName, Double NewValue, DAL DAL) 
         {
-            Double CurrentValue = Convert.ToDouble(DAL.GetStock(StockId).currentValue);
+            String Date = DateTime.Now.ToString("dd/MM/yy");
+            Stock Stock = DAL.GetStock(SName);
+            Stockvalue StockValue = DAL.GetStockValue(SName, Date);
+            
+           
+            if (Stock == null) {
+                return null;
+            }
+            else if (StockValue != null) {
+                return DAL.SetStockValue(SName, Date, NewValue, Stock.orgNr);
+            }
+            else
+            {
+                DAL.UpdateStock(Stock.sName, Stock.sInfo, NewValue, Stock.orgNr);
+                return DAL.SetStockValue(SName, Date, NewValue, Stock.orgNr);
+            }
+            
+
+        }
+        public String BuyStock(String UserId, String SName, Double Value, int Amount, DAL DAL)
+        {
+            Double StocksValue = Value * Amount;
+            String Date = DateTime.Now.ToString("dd/MM/yy");
+
+
+            
+            if (StocksValue > DAL.GetUser(UserId).account)
+            {
+                return null;
+            }
+            else if (DAL.GetStockPortfolio(UserId, SName) != null)
+            {
+
+                int CurrentAmount = Convert.ToInt32(DAL.GetStockPortfolio(UserId, SName).amount);
+                int NewAmount = CurrentAmount + Amount;
+
+                DAL.UpdateStockPortfolio(UserId, SName, NewAmount);
+                return DAL.AccountSaldoUpdade(UserId, -StocksValue);
+                
+            }
+            else
+            {
+
+                return DAL.SetStockPortfolio(UserId, SName, Date, Value, Amount);
+            }
+
+        }
+        public String SellStock(String UserId, String SName, int Amount, DAL DAL)
+        {
+            Double CurrentValue = Convert.ToDouble(DAL.GetStock(SName).currentValue);
             Double Earned = 0;
             int NewAmount;
             Earned = Amount * CurrentValue;
 
-            Stockportfolio StockPortfolio = DAL.GetStockPortfolio(UserId, StockId);
+            Stockportfolio StockPortfolio = DAL.GetStockPortfolio(UserId, SName);
             NewAmount = (Convert.ToInt32(StockPortfolio.amount) - Amount);
             if (NewAmount == 0)
             {
-                DAL.RemoveStockportfolio(UserId, StockId);
+                DAL.RemoveStockportfolio(UserId, SName);
+            }
+            else if (NewAmount > 0)
+            {
+                return null;
             }
             else
             {
-                DAL.UpdateStockPortfolio(UserId, StockId, NewAmount);
+                DAL.UpdateStockPortfolio(UserId, SName, NewAmount);
             }
-            return DAL.SellStock(UserId, Earned);
+            return DAL.AccountSaldoUpdade(UserId, Earned);
         }
+
         public String LoginCheck(String UserId, String PassWord, DAL DAL)
         {
+
 
             
                 if (DAL.GetAdminPassWordCheck(UserId, PassWord) != null)
                 {
                     return "admin";
                 }
-                else if (DAL.GetUserPassWordCheck(UserId, PassWord) != null)
+                else if(DAL.GetUserPassWordCheck(UserId, PassWord) != null)
                 {
                     return "user";
                 }
@@ -61,9 +114,9 @@ namespace StockExchange
                 StockArray[3] = Convert.ToString(S.value);
 
                 Double CurrentValue = Convert.ToDouble(DAL.GetStock(S.sName).currentValue);
-                String Value = ((CurrentValue / S.value) * 100).ToString(".##");
+                String Profit = ((CurrentValue / S.value) * 100).ToString(".##");
 
-                StockArray[4] = Value;
+                StockArray[4] = Profit;
                 
                 TmpStockList.Add(StockArray);
             }
